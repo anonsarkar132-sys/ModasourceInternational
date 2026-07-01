@@ -7,7 +7,7 @@ import { ChevronDown, ChevronUp, Play } from "lucide-react";
 
 export default function HomePage() {
   const [heroBanner, setHeroBanner] = useState<any>(null);
-  const [activeAccordion, setActiveAccordion] = useState<number | null>(0);
+  const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchBanners = async () => {
