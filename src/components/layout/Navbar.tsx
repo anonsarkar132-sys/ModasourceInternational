@@ -321,11 +321,13 @@ export default function Navbar() {
 
             {/* Products Mobile Section */}
             <div className="py-3">
-              <p
-                className={`text-xs uppercase tracking-[0.2em] font-bold mb-5 ${isProductsActive ? "text-[#C89B3C]" : "text-neutral-500"}`}
-              >
-                Products
-              </p>
+              <Link href="/products" onClick={() => setIsMobileOpen(false)}>
+                <p
+                  className={`text-xs uppercase tracking-[0.2em] font-bold mb-5 ${isProductsActive ? "text-[#C89B3C]" : "text-neutral-500"}`}
+                >
+                  Products
+                </p>
+              </Link>
               {productMenu?.mainCategories?.map((main) => (
                 <div key={main._id} className="mb-5 pl-2">
                   <Link
