@@ -23,7 +23,7 @@ const createCategory = async (req: NextRequest) => {
       slug = formData.get("slug") as string;
       parent = (formData.get("parent") as string) || null;
       const sortOrderVal = formData.get("sortOrder");
-      sortOrder = sortOrderVal ? parseInt(sortOrderVal as string) || 0 : 0;
+      sortOrder = sortOrderVal ? Number(sortOrderVal as string) : 0;
       const file = formData.get("file") as File | null;
 
       if (file && file.size > 0) {
@@ -46,7 +46,7 @@ const createCategory = async (req: NextRequest) => {
       slug = body.slug;
       parent = body.parent || null;
       imageUrl = body.image || "";
-      sortOrder = body.sortOrder || 0;
+      sortOrder = body.sortOrder !== undefined ? Number(body.sortOrder) : 0;
     }
 
     if (!name || !slug) {
@@ -109,7 +109,7 @@ const updateCategory = async (
       updateData.parent = (formData.get("parent") as string) || null;
       const sortOrderVal = formData.get("sortOrder");
       if (sortOrderVal !== null && sortOrderVal !== "") {
-        updateData.sortOrder = parseInt(sortOrderVal as string) || 0;
+        updateData.sortOrder = Number(sortOrderVal as string);
       }
       const file = formData.get("file") as File | null;
       if (file && file.size > 0) {

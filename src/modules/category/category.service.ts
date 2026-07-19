@@ -8,7 +8,6 @@ const getAllCategories = async () => {
     .populate("parent")
     .sort({ sortOrder: 1, createdAt: -1 });
 };
-// Mongoose warning theek kora holo
 const updateCategory = async (id: string, payload: Partial<ICategory>) => {
   return await Category.findByIdAndUpdate(id, payload, {
     returnDocument: "after",
