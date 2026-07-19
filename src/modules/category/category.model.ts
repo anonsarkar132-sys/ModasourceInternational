@@ -7,8 +7,10 @@ const categorySchema = new Schema<ICategory>(
     slug: { type: String, required: true, unique: true },
     image: { type: String, default: "" },
     parent: { type: Schema.Types.ObjectId, ref: "Category", default: null },
+    sortOrder: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-export const Category = models.Category || model<ICategory>("Category", categorySchema);
+export const Category =
+  models.Category || model<ICategory>("Category", categorySchema);

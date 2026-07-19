@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -32,7 +32,9 @@ export default function CategoryDynamicPage() {
         if (!catData.success) throw new Error("Invalid category response");
 
         const allCategories: any[] = catData.data;
-        const foundCat = allCategories.find((c: any) => c.slug === categorySlug);
+        const foundCat = allCategories.find(
+          (c: any) => c.slug === categorySlug
+        );
 
         if (!foundCat) {
           setError("Category not found");
@@ -49,7 +51,9 @@ export default function CategoryDynamicPage() {
         setSubCategories(children);
 
         if (children.length === 0) {
-          const prodRes = await fetch(`/api/v1/products?category=${categorySlug}`);
+          const prodRes = await fetch(
+            `/api/v1/products?category=${categorySlug}`
+          );
           if (!prodRes.ok) throw new Error("Failed to fetch products");
           const prodData = await prodRes.json();
           if (prodData.success) setProducts(prodData.data);
@@ -81,7 +85,10 @@ export default function CategoryDynamicPage() {
       <div className="flex flex-col justify-center items-center h-[80vh] text-neutral-500 p-4">
         <AlertCircle size={40} className="mb-4 text-red-400" />
         <p className="font-mono text-sm uppercase text-center">{error}</p>
-        <Link href="/products" className="mt-6 text-xs border-b border-neutral-800 pb-1">
+        <Link
+          href="/products"
+          className="mt-6 text-xs border-b border-neutral-800 pb-1"
+        >
           Back to Collections
         </Link>
       </div>
@@ -112,7 +119,7 @@ export default function CategoryDynamicPage() {
             {subCategories.map((sub) => {
               const isValidImage =
                 sub.image &&
-                sub.image.startsWith("http") &&
+                sub.image.startsWith("https") &&
                 (sub.image.match(/\.(jpg|jpeg|png|webp|gif|svg)/i) ||
                   sub.image.includes("unsplash") ||
                   sub.image.includes("cloudinary") ||
@@ -166,6 +173,94 @@ export default function CategoryDynamicPage() {
     );
   }
 
+  // ===== Product Card Component with Image Slideshow =====
+  function ProductCard({ product }: { product: any }) {
+    const [imgIndex, setImgIndex] = useState(0);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const images = product.images?.filter((img: string) => img?.trim()) || [];
+    const hasMultiple = images.length > 1;
+
+    const goToNext = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setImgIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const goToPrev = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    };
+
+    return (
+      <Link
+        href={`/product/${product._id}`}
+        className="group flex flex-col cursor-pointer"
+      >
+        <div className="w-full aspect-[3/4] bg-neutral-50 border border-neutral-100 flex items-center justify-center overflow-hidden relative">
+          <img
+            src={images[imgIndex] || images[0]}
+            alt={product.name}
+            className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
+          />
+
+          {/* Left/Right Arrow Buttons — show on hover */}
+          {hasMultiple && (
+            <>
+              <button
+                onClick={goToPrev}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 backdrop-blur-sm border border-neutral-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white shadow-sm rounded-full"
+                aria-label="Previous image"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-700"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                onClick={goToNext}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 backdrop-blur-sm border border-neutral-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white shadow-sm rounded-full"
+                aria-label="Next image"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-700"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-neutral-800 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+        </div>
+        <div className="mt-3">
+          <h3 className="text-[11px] font-mono text-neutral-500 uppercase tracking-[0.15em] group-hover:text-neutral-900 transition-colors duration-300">
+            {product.name}
+          </h3>
+        </div>
+      </Link>
+    );
+  }
+
   // CASE 2: Product Grid (leaf category)
   return (
     <div className="w-full bg-white font-sans min-h-screen">
@@ -201,24 +296,7 @@ export default function CategoryDynamicPage() {
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div
-                key={product._id}
-                className="group flex flex-col cursor-pointer"
-              >
-                <div className="w-full aspect-[3/4] bg-neutral-50 border border-neutral-100 flex items-center justify-center overflow-hidden relative">
-                  <img
-                    src={product.images?.[0]}
-                    alt={product.name}
-                    className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-neutral-800 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                </div>
-                <div className="mt-3">
-                  <h3 className="text-[11px] font-mono text-neutral-500 uppercase tracking-[0.15em] group-hover:text-neutral-900 transition-colors duration-300">
-                    {product.name}
-                  </h3>
-                </div>
-              </div>
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         )}

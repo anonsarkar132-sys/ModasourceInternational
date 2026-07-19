@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { Brand } from "./brand.model";
 import { sendResponse } from "../../lib/sendResponse";
+import { deleteUploadedFile } from "../../lib/deleteFile";
 import path from "path";
 import fs from "fs";
 import { writeFile } from "fs/promises";
@@ -66,9 +67,16 @@ const getAllBrands = async () => {
 
 const deleteBrand = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const { id } = await params;
+
+  // Fetch brand first to get logo URL
+  const brand = await Brand.findById(id);
+  if (brand && brand.logoUrl) {
+    deleteUploadedFile(brand.logoUrl);
+  }
+
   const result = await Brand.findByIdAndDelete(id);
   return sendResponse({
     statusCode: 200,
