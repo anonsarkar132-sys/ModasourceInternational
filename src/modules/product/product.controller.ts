@@ -89,7 +89,7 @@ const getAllProducts = async (req: NextRequest) => {
 
 const getSingleProduct = async (
   req: NextRequest,
-  { params }: { params: Promise<any> }
+  { params }: { params: Promise<any> },
 ) => {
   const { id, slug } = await params;
   const result = await ProductService.getSingleProduct(id || slug);
@@ -103,22 +103,114 @@ const getSingleProduct = async (
 
 const updateProduct = async (
   req: NextRequest,
-  { params }: { params: Promise<any> }
+  { params }: { params: Promise<any> },
 ) => {
-  const body = await req.json();
-  const { id, slug } = await params;
-  const result = await ProductService.updateProduct(id || slug, body);
-  return sendResponse({
-    statusCode: 200,
-    success: true,
-    message: "Product updated",
-    data: result,
-  });
+  try {
+    const { id, slug } = await params;
+    const identifier = id || slug;
+
+    // Check if request has FormData (file upload) or JSON
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      // Handle FormData with file uploads
+      const formData = await req.formData();
+      const name = formData.get("name") as string;
+      const slugValue = formData.get("slug") as string;
+      const description = formData.get("description") as string;
+      const category = formData.get("category") as string;
+      const isFeatured = formData.get("isFeatured") === "true";
+      const existingImages = formData.get("existingImages") as string;
+
+      // Get existing images array if provided
+      const existingImagesArray = existingImages
+        ? JSON.parse(existingImages)
+        : [];
+
+      // Handle new image files
+      const files = formData.getAll("images") as File[];
+
+      const uploadDir = path.join(
+        process.cwd(),
+        "public",
+        "uploads",
+        "products",
+      );
+      if (!fs.existsSync(uploadDir))
+        fs.mkdirSync(uploadDir, { recursive: true });
+
+      const newImageUrls: string[] = [];
+      for (const file of files) {
+        if (file.size === 0) continue;
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const filename = `${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}-${file.name.replace(/\s/g, "_")}`;
+        await writeFile(path.join(uploadDir, filename), buffer);
+        newImageUrls.push(`/uploads/products/${filename}`);
+      }
+
+      // Combine existing and new images
+      const allImages = [...existingImagesArray, ...newImageUrls];
+
+      if (!name || !slugValue || !description || !category) {
+        return sendResponse({
+          statusCode: 400,
+          success: false,
+          message: "All fields are required",
+          data: null,
+        });
+      }
+
+      if (allImages.length === 0) {
+        return sendResponse({
+          statusCode: 400,
+          success: false,
+          message: "At least one image is required",
+          data: null,
+        });
+      }
+
+      const result = await ProductService.updateProduct(identifier, {
+        name,
+        slug: slugValue,
+        description,
+        category,
+        images: allImages,
+        isFeatured,
+      });
+
+      return sendResponse({
+        statusCode: 200,
+        success: true,
+        message: "Product updated",
+        data: result,
+      });
+    } else {
+      // Handle JSON data (backward compatibility)
+      const body = await req.json();
+      const result = await ProductService.updateProduct(identifier, body);
+      return sendResponse({
+        statusCode: 200,
+        success: true,
+        message: "Product updated",
+        data: result,
+      });
+    }
+  } catch (error: any) {
+    console.error("Product update error:", error);
+    return sendResponse({
+      statusCode: 500,
+      success: false,
+      message: error?.message || "Failed to update product",
+      data: null,
+    });
+  }
 };
 
 const deleteProduct = async (
   req: NextRequest,
-  { params }: { params: Promise<any> }
+  { params }: { params: Promise<any> },
 ) => {
   const { id, slug } = await params;
   const identifier = id || slug;

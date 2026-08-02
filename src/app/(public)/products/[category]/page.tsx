@@ -33,7 +33,7 @@ export default function CategoryDynamicPage() {
 
         const allCategories: any[] = catData.data;
         const foundCat = allCategories.find(
-          (c: any) => c.slug === categorySlug
+          (c: any) => c.slug === categorySlug,
         );
 
         if (!foundCat) {
@@ -52,7 +52,7 @@ export default function CategoryDynamicPage() {
 
         if (children.length === 0) {
           const prodRes = await fetch(
-            `/api/v1/products?category=${categorySlug}`
+            `/api/v1/products?category=${categorySlug}`,
           );
           if (!prodRes.ok) throw new Error("Failed to fetch products");
           const prodData = await prodRes.json();
@@ -119,11 +119,13 @@ export default function CategoryDynamicPage() {
             {subCategories.map((sub) => {
               const isValidImage =
                 sub.image &&
-                sub.image.startsWith("https") &&
+                (sub.image.startsWith("https") ||
+                  sub.image.startsWith("/uploads/")) &&
                 (sub.image.match(/\.(jpg|jpeg|png|webp|gif|svg)/i) ||
                   sub.image.includes("unsplash") ||
                   sub.image.includes("cloudinary") ||
-                  sub.image.includes("imgur"));
+                  sub.image.includes("imgur") ||
+                  sub.image.startsWith("/uploads/"));
 
               const imageSrc = isValidImage
                 ? sub.image
