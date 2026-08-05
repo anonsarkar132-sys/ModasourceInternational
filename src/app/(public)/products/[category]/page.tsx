@@ -203,7 +203,7 @@ export default function CategoryDynamicPage() {
           <img
             src={images[imgIndex] || images[0]}
             alt={product.name}
-            className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
           {/* Left/Right Arrow Buttons — show on hover */}
