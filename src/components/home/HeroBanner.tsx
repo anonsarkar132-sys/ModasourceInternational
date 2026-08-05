@@ -56,8 +56,12 @@ export default function HeroBanner() {
     return (
       <div className="w-full h-[70vh] bg-neutral-900 flex items-center justify-center text-white text-center px-4">
         <div>
-          <h1 className="text-4xl md:text-6xl font-serif mb-4">Welcome to Moda Source</h1>
-          <p className="text-neutral-400 mb-8 max-w-xl mx-auto">Please add a banner from the admin panel.</p>
+          <h1 className="text-4xl md:text-6xl font-serif mb-4">
+            Welcome to Moda Source
+          </h1>
+          <p className="text-neutral-400 mb-8 max-w-xl mx-auto">
+            Please add a banner from the admin panel.
+          </p>
         </div>
       </div>
     );
@@ -66,41 +70,41 @@ export default function HeroBanner() {
   const activeBanner = banners[currentSlide];
 
   return (
-    <div className="relative w-full h-[70vh] md:h-[85vh] overflow-hidden bg-neutral-900">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-1000 ease-in-out scale-105"
-        style={{ backgroundImage: `url(${activeBanner.imageUrl})` }}
-      >
-        <div className="absolute inset-0 bg-black/50"></div> {/* Dark overlay jate text bojha jay */}
-      </div>
-
+    <div className="relative w-full overflow-hidden bg-neutral-900">
+      {/* Background Image — Natural ratio on all devices: full image visible, no crop, no black bars */}
+      <img
+        src={activeBanner.imageUrl}
+        alt={activeBanner.title || "Hero Banner"}
+        className="w-full h-auto transition-all duration-1000 ease-in-out"
+      />
+      <div className="absolute inset-0 bg-black/50"></div>{" "}
+      {/* Dark overlay jate text bojha jay */}
       {/* Content */}
-      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-start text-white">
-        <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <h1 className="text-5xl md:text-7xl font-serif tracking-tight leading-tight mb-6">
+      <div className="absolute inset-0 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end md:justify-center items-start text-white pb-16 md:pb-0">
+        <div className="max-w-2xl w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif tracking-tight leading-tight mb-4 md:mb-6">
             {activeBanner.title || "Global Reach, Local Expertise"}
           </h1>
-          <p className="text-lg md:text-xl text-neutral-200 mb-10 max-w-xl font-light">
-            {activeBanner.subtitle || "Your premier solution provider in apparel design, sourcing, and manufacturing."}
+          <p className="text-base md:text-xl text-neutral-200 mb-6 md:mb-10 max-w-xl font-light">
+            {activeBanner.subtitle ||
+              "Your premier solution provider in apparel design, sourcing, and manufacturing."}
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href="/products" 
-              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-md font-medium transition-colors flex items-center gap-2"
+          <div className="flex flex-wrap gap-3 md:gap-4">
+            <Link
+              href="/products"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-md font-medium transition-colors flex items-center gap-2"
             >
               Explore Collection <ArrowRight size={18} />
             </Link>
-            <Link 
-              href="/contact" 
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-md font-medium transition-colors"
+            <Link
+              href="/contact"
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-md font-medium transition-colors"
             >
               Contact Us
             </Link>
           </div>
         </div>
       </div>
-
       {/* Slider Indicators */}
       {banners.length > 1 && (
         <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2 z-20">
@@ -109,7 +113,9 @@ export default function HeroBanner() {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                currentSlide === index ? "w-8 bg-amber-600" : "w-4 bg-white/50 hover:bg-white/80"
+                currentSlide === index
+                  ? "w-8 bg-amber-600"
+                  : "w-4 bg-white/50 hover:bg-white/80"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

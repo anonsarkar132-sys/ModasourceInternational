@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Category } from "@/modules/category/category.model";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
@@ -13,6 +14,12 @@ export const connectDB = async () => {
       socketTimeoutMS: 45000,
       family: 4,
     });
+
+    // Drop the old globally-unique `name_1` index and create the new
+    // compound `{ parent: 1, name: 1 }` unique index. This lets the same
+    // subcategory name exist under different parents.
+    await Category.syncIndexes();
+
     console.log("✅ MongoDB Connected");
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error);

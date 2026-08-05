@@ -9,17 +9,9 @@ import { writeFile } from "fs/promises";
 const createBrand = async (req: NextRequest) => {
   try {
     const formData = await req.formData();
-    const name = formData.get("name") as string;
+    const name = (formData.get("name") as string) || "";
     const file = formData.get("file") as File | null;
 
-    if (!name) {
-      return sendResponse({
-        statusCode: 400,
-        success: false,
-        message: "Name is required",
-        data: null,
-      });
-    }
     if (!file || file.size === 0) {
       return sendResponse({
         statusCode: 400,
@@ -67,7 +59,7 @@ const getAllBrands = async () => {
 
 const deleteBrand = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   const { id } = await params;
 

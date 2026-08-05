@@ -1,16 +1,16 @@
 import { Schema, model, models } from "mongoose";
 
 export interface IBrand {
-  name: string;
+  name?: string;
   logoUrl: string;
 }
 
 const brandSchema = new Schema<IBrand>(
   {
-    name: { type: String, required: true },
+    name: { type: String, default: "" },
     logoUrl: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Brand = models.Brand || model<IBrand>("Brand", brandSchema);

@@ -59,7 +59,7 @@ export default function CategoryProductsPage({
           <img
             src={images[imgIndex] || images[0]}
             alt={product.name}
-            className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-[1.5s]"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s]"
           />
 
           {/* Left/Right Arrow Buttons — show on hover */}

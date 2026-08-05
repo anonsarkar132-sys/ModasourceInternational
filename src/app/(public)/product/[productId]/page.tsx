@@ -168,7 +168,7 @@ export default function ProductDetailPage() {
               <img
                 src={currentImage}
                 alt={product.name}
-                className="w-full h-full object-contain p-10 md:p-16 transition-opacity duration-500"
+                className="w-full h-full object-cover transition-opacity duration-500"
               />
 
               {/* Image Navigation Arrows */}
@@ -177,7 +177,7 @@ export default function ProductDetailPage() {
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
-                        prev === 0 ? images.length - 1 : prev - 1
+                        prev === 0 ? images.length - 1 : prev - 1,
                       )
                     }
                     className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm border border-neutral-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-400 hover:bg-white shadow-sm"
@@ -188,7 +188,7 @@ export default function ProductDetailPage() {
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
-                        prev === images.length - 1 ? 0 : prev + 1
+                        prev === images.length - 1 ? 0 : prev + 1,
                       )
                     }
                     className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm border border-neutral-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-400 hover:bg-white shadow-sm"
