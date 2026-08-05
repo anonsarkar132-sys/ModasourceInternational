@@ -33,7 +33,7 @@ const createCategory = async (req: NextRequest) => {
           process.cwd(),
           "public",
           "uploads",
-          "categories"
+          "categories",
         );
         if (!fs.existsSync(uploadDir))
           fs.mkdirSync(uploadDir, { recursive: true });
@@ -58,7 +58,7 @@ const createCategory = async (req: NextRequest) => {
       });
     }
 
-    const result = await Category.create({
+    const result = await CategoryService.createCategory({
       name,
       slug,
       image: imageUrl,
@@ -74,6 +74,15 @@ const createCategory = async (req: NextRequest) => {
     });
   } catch (error: any) {
     console.error("Category create error:", error);
+    // Duplicate key error (code 11000) — same name under the same parent
+    if (error?.code === 11000) {
+      return sendResponse({
+        statusCode: 400,
+        success: false,
+        message: `A category named "${name}" already exists under this parent.`,
+        data: null,
+      });
+    }
     return sendResponse({
       statusCode: 500,
       success: false,
@@ -95,7 +104,7 @@ const getAllCategories = async () => {
 
 const updateCategory = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
     const { id } = await params;
@@ -126,7 +135,7 @@ const updateCategory = async (
           process.cwd(),
           "public",
           "uploads",
-          "categories"
+          "categories",
         );
         if (!fs.existsSync(uploadDir))
           fs.mkdirSync(uploadDir, { recursive: true });
@@ -160,6 +169,15 @@ const updateCategory = async (
     });
   } catch (error: any) {
     console.error("Category update error:", error);
+    // Duplicate key error (code 11000) — same name under the same parent
+    if (error?.code === 11000) {
+      return sendResponse({
+        statusCode: 400,
+        success: false,
+        message: "A category with this name already exists under this parent.",
+        data: null,
+      });
+    }
     return sendResponse({
       statusCode: 500,
       success: false,
@@ -171,7 +189,7 @@ const updateCategory = async (
 
 const deleteCategory = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   const { id } = await params;
 
